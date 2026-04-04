@@ -1,31 +1,48 @@
 <script setup lang="ts">
-import { ref, computed } from "vue";
-import type { Framework } from "../types/investigation";
+import { computed, ref } from "vue";
+import { investigateFailure } from "../services/api";
+import type {
+  Framework,
+  InvestigationResult
+} from "../types/investigation";
+import InvestigationResultView from "./InvestigationResult.vue";
 
 const errorLog = ref("");
 const context = ref("");
 const framework = ref<Framework>("vitest");
 const loading = ref(false);
+const error = ref<string | null>(null);
+const result = ref<InvestigationResult | null>(null);
 
 const isDisabled = computed(() => {
   return !errorLog.value.trim() || loading.value;
 });
 
-function handleSubmit() {
-  if (isDisabled.value) return;
+async function handleSubmit() {
+  if (isDisabled.value) {
+    return;
+  }
 
   loading.value = true;
+  error.value = null;
+  result.value = null;
 
-  // Placeholder temporal (luego conectamos con backend)
-  setTimeout(() => {
-    console.log({
+  try {
+    const investigation = await investigateFailure({
       errorLog: errorLog.value,
-      context: context.value,
+      context: context.value.trim() || undefined,
       framework: framework.value
     });
 
+    result.value = investigation;
+  } catch (err) {
+    error.value =
+      err instanceof Error
+        ? err.message
+        : "Something went wrong while investigating the failure";
+  } finally {
     loading.value = false;
-  }, 800);
+  }
 }
 </script>
 
@@ -70,6 +87,12 @@ function handleSubmit() {
     <button :disabled="isDisabled" @click="handleSubmit">
       {{ loading ? "Investigating..." : "Investigate failure" }}
     </button>
+
+    <p v-if="error" class="error-message">
+      {{ error }}
+    </p>
+
+    <InvestigationResultView v-if="result" :result="result" />
   </div>
 </template>
 
@@ -81,25 +104,19 @@ function handleSubmit() {
   font-family: system-ui, sans-serif;
 }
 
-/* 🔥 Título adaptativo */
 h1 {
   margin: 0 0 1rem;
   text-align: center;
   font-weight: 700;
-
-  /* clave */
   font-size: clamp(2rem, 4vw, 3rem);
   line-height: 1.1;
 }
 
-/* 🔥 Subtítulo equilibrado */
 .subtitle {
   color: #666;
   margin: 0 auto 2rem;
   text-align: center;
-
   max-width: 600px;
-
   font-size: clamp(0.95rem, 1.5vw, 1.1rem);
   line-height: 1.6;
 }
@@ -125,17 +142,24 @@ select {
 }
 
 button {
+  display: block;
+  margin: 0 auto;
   padding: 0.75rem 1.25rem;
   border: none;
   background: black;
   color: white;
   border-radius: 6px;
   cursor: pointer;
-  margin: 0 auto;
 }
 
 button:disabled {
   background: #999;
   cursor: not-allowed;
+}
+
+.error-message {
+  margin-top: 1rem;
+  color: #b42318;
+  text-align: center;
 }
 </style>
