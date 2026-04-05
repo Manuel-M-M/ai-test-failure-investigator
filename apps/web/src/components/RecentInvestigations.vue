@@ -5,14 +5,20 @@ import {
   type StoredInvestigation
 } from "../utils/storage";
 
+/* 🔌 Emit para comunicar al parent */
+const emit = defineEmits<{
+  (e: "select", item: StoredInvestigation): void;
+}>();
+
 const investigations = ref<StoredInvestigation[]>([]);
 
 function loadInvestigations() {
   investigations.value = getInvestigations();
 }
 
+/* 👇 Ahora sí usable */
 function select(item: StoredInvestigation) {
-  console.log("selected", item);
+  emit("select", item);
 }
 
 onMounted(() => {
@@ -37,7 +43,8 @@ onUnmounted(() => {
       >
         <div class="title">
           {{ item.input.framework }} ·
-          {{ item.input.errorLog.slice(0, 80) }}<span v-if="item.input.errorLog.length > 80">...</span>
+          {{ item.input.errorLog.slice(0, 80) }}
+          <span v-if="item.input.errorLog.length > 80">...</span>
         </div>
 
         <div class="meta">
@@ -54,7 +61,7 @@ onUnmounted(() => {
   margin: 2rem auto;
 }
 
-/* Section title (centrado → correcto) */
+/* Section title */
 h3 {
   margin-bottom: 1.25rem;
   font-size: 0.95rem;
@@ -64,7 +71,7 @@ h3 {
   letter-spacing: 0.02em;
 }
 
-/* Lista base */
+/* Lista */
 ul {
   list-style: none;
   padding: 0;
@@ -83,10 +90,10 @@ li {
 
   display: flex;
   flex-direction: column;
-  align-items: flex-start; /* 👈 clave: alineación izquierda */
+  align-items: flex-start;
 }
 
-/* Hover sutil (tool feeling) */
+/* Hover */
 li:hover {
   background: #f9fafb;
   border-color: #d0d5dd;
@@ -99,14 +106,13 @@ li:hover {
   text-align: left;
   line-height: 1.4;
 
-  /* Truncado limpio */
   display: -webkit-box;
   -webkit-line-clamp: 2;
   -webkit-box-orient: vertical;
   overflow: hidden;
 }
 
-/* Metadata (fecha) */
+/* Metadata */
 .meta {
   font-size: 0.75rem;
   color: #667085;

@@ -5,11 +5,12 @@ import type {
   Framework,
   InvestigationResult
 } from "../types/investigation";
-import { saveInvestigation } from "../utils/storage";
+import { saveInvestigation, type StoredInvestigation } from "../utils/storage";
 
 import EmptyState from "./EmptyState.vue";
 import InvestigationResultView from "./InvestigationResult.vue";
 import LoadingState from "./LoadingState.vue";
+import RecentInvestigations from "./RecentInvestigations.vue";
 
 const errorLog = ref("");
 const context = ref("");
@@ -47,7 +48,6 @@ async function handleSubmit() {
       input: payload,
       result: investigation
     });
-
   } catch (err) {
     error.value =
       err instanceof Error
@@ -56,6 +56,17 @@ async function handleSubmit() {
   } finally {
     loading.value = false;
   }
+}
+
+function loadFromHistory(item: StoredInvestigation) {
+  errorLog.value = item.input.errorLog;
+  context.value = item.input.context || "";
+  framework.value = item.input.framework;
+
+  result.value = item.result;
+  error.value = null;
+  hasSubmitted.value = true;
+  loading.value = false;
 }
 </script>
 
@@ -107,7 +118,6 @@ async function handleSubmit() {
       </p>
     </section>
 
-    <!-- STATES -->
     <LoadingState v-if="loading" />
 
     <InvestigationResultView
@@ -116,6 +126,8 @@ async function handleSubmit() {
     />
 
     <EmptyState v-else-if="!hasSubmitted" />
+
+    <RecentInvestigations @select="loadFromHistory" />
   </div>
 </template>
 
