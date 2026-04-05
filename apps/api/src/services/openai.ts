@@ -1,12 +1,23 @@
-import OpenAI from "openai";
 import type {
   InvestigationRequest,
   InvestigationResponse
 } from "../types/investigation.js";
 
-const client = new OpenAI({
-  apiKey: process.env.OPENAI_API_KEY
-});
+let clientPromise: Promise<any> | null = null;
+
+async function getClient() {
+  if (!clientPromise) {
+    clientPromise = import("openai").then((mod) => {
+      const OpenAI = mod.default;
+
+      return new OpenAI({
+        apiKey: process.env.OPENAI_API_KEY
+      });
+    });
+  }
+
+  return clientPromise;
+}
 
 function buildPrompt(input: InvestigationRequest): string {
   return `
@@ -44,6 +55,8 @@ ${input.errorLog}
 export async function investigateFailure(
   input: InvestigationRequest
 ): Promise<InvestigationResponse> {
+  const client = await getClient();
+
   const response = await client.responses.create({
     model: "gpt-4.1-mini",
     input: buildPrompt(input)
