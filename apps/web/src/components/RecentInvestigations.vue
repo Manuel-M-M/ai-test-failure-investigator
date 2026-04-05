@@ -5,7 +5,7 @@ import {
   type StoredInvestigation
 } from "../utils/storage";
 
-/* 🔌 Emit para comunicar al parent */
+/* Emit to communicate with parent */
 const emit = defineEmits<{
   (e: "select", item: StoredInvestigation): void;
 }>();
@@ -16,7 +16,6 @@ function loadInvestigations() {
   investigations.value = getInvestigations();
 }
 
-/* 👇 Ahora sí usable */
 function select(item: StoredInvestigation) {
   emit("select", item);
 }
