@@ -3,22 +3,6 @@ import type {
   InvestigationResponse
 } from "../types/investigation.js";
 
-let clientPromise: Promise<any> | null = null;
-
-async function getClient() {
-  if (!clientPromise) {
-    clientPromise = import("openai").then((mod) => {
-      const OpenAI = mod.default;
-
-      return new OpenAI({
-        apiKey: process.env.OPENAI_API_KEY
-      });
-    });
-  }
-
-  return clientPromise;
-}
-
 function buildPrompt(input: InvestigationRequest): string {
   return `
 You are a senior product engineer specialized in developer tooling, testing, and debugging.
@@ -52,20 +36,80 @@ ${input.errorLog}
 `.trim();
 }
 
+interface ResponsesApiOutputText {
+  type: "output_text";
+  text: string;
+}
+
+interface ResponsesApiMessage {
+  type: "message";
+  content?: Array<ResponsesApiOutputText | { type: string; [key: string]: unknown }>;
+}
+
+interface ResponsesApiResponse {
+  output?: Array<ResponsesApiMessage | { type: string; [key: string]: unknown }>;
+}
+
+function extractOutputText(data: ResponsesApiResponse): string | null {
+  const output = data.output;
+
+  if (!Array.isArray(output)) {
+    return null;
+  }
+
+  for (const item of output) {
+    if (item.type !== "message" || !Array.isArray(item.content)) {
+      continue;
+    }
+
+    for (const contentItem of item.content) {
+      if (contentItem.type === "output_text" && typeof contentItem.text === "string") {
+        return contentItem.text;
+      }
+    }
+  }
+
+  return null;
+}
+
 export async function investigateFailure(
   input: InvestigationRequest
 ): Promise<InvestigationResponse> {
-  const client = await getClient();
+  const apiKey = process.env.OPENAI_API_KEY;
 
-  const response = await client.responses.create({
-    model: "gpt-4.1-mini",
-    input: buildPrompt(input)
+  if (!apiKey) {
+    throw new Error("OPENAI_API_KEY is missing");
+  }
+
+  const response = await fetch("https://api.openai.com/v1/responses", {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+      Authorization: `Bearer ${apiKey}`
+    },
+    body: JSON.stringify({
+      model: "gpt-4.1-mini",
+      input: buildPrompt(input),
+      text: {
+        format: {
+          type: "text"
+        }
+      }
+    })
   });
 
-  const outputText = response.output_text;
+  if (!response.ok) {
+    const errorBody = await response.text();
+    throw new Error(
+      `OpenAI request failed with ${response.status}: ${errorBody}`
+    );
+  }
+
+  const data = (await response.json()) as ResponsesApiResponse;
+  const outputText = extractOutputText(data);
 
   if (!outputText) {
-    throw new Error("OpenAI returned an empty response");
+    throw new Error(`OpenAI returned no output_text. Raw response: ${JSON.stringify(data)}`);
   }
 
   return JSON.parse(outputText) as InvestigationResponse;
