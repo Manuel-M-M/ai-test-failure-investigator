@@ -5,6 +5,8 @@ import type {
   Framework,
   InvestigationResult
 } from "../types/investigation";
+import { saveInvestigation } from "../utils/storage";
+
 import EmptyState from "./EmptyState.vue";
 import InvestigationResultView from "./InvestigationResult.vue";
 import LoadingState from "./LoadingState.vue";
@@ -12,6 +14,7 @@ import LoadingState from "./LoadingState.vue";
 const errorLog = ref("");
 const context = ref("");
 const framework = ref<Framework>("vitest");
+
 const loading = ref(false);
 const error = ref<string | null>(null);
 const result = ref<InvestigationResult | null>(null);
@@ -22,23 +25,29 @@ const isDisabled = computed(() => {
 });
 
 async function handleSubmit() {
-  if (isDisabled.value) {
-    return;
-  }
+  if (isDisabled.value) return;
 
   hasSubmitted.value = true;
   loading.value = true;
   error.value = null;
   result.value = null;
 
+  const payload = {
+    errorLog: errorLog.value,
+    context: context.value.trim() || undefined,
+    framework: framework.value
+  };
+
   try {
-    const investigation = await investigateFailure({
-      errorLog: errorLog.value,
-      context: context.value.trim() || undefined,
-      framework: framework.value
-    });
+    const investigation = await investigateFailure(payload);
 
     result.value = investigation;
+
+    saveInvestigation({
+      input: payload,
+      result: investigation
+    });
+
   } catch (err) {
     error.value =
       err instanceof Error
@@ -98,8 +107,14 @@ async function handleSubmit() {
       </p>
     </section>
 
+    <!-- STATES -->
     <LoadingState v-if="loading" />
-    <InvestigationResultView v-else-if="result" :result="result" />
+
+    <InvestigationResultView
+      v-else-if="result"
+      :result="result"
+    />
+
     <EmptyState v-else-if="!hasSubmitted" />
   </div>
 </template>
