@@ -5,16 +5,27 @@ import investigateRouter from "./routes/investigate.js";
 
 const app = express();
 
-const corsOptions: cors.CorsOptions = {
-  origin: [
-    "http://localhost:5173"
-  ],
-  methods: ["GET", "POST", "OPTIONS"],
-  allowedHeaders: ["Content-Type", "Authorization"]
-};
+const allowedOrigins = [
+  "http://localhost:5173",
+  "https://ai-test-failure-investigator-web.vercel.app"
+];
 
-app.use(cors(corsOptions));
-app.options("*", cors(corsOptions));
+app.use(
+  cors({
+    origin(origin, callback) {
+      if (!origin || allowedOrigins.includes(origin)) {
+        return callback(null, true);
+      }
+
+      return callback(new Error(`Origin not allowed by CORS: ${origin}`));
+    },
+    methods: ["GET", "POST", "OPTIONS"],
+    allowedHeaders: ["Content-Type", "Authorization"]
+  })
+);
+
+app.options("*", cors());
+
 app.use(express.json());
 
 app.get("/health", (_req, res) => {
