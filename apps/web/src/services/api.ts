@@ -3,10 +3,10 @@ import type {
   InvestigationResult
 } from "../types/investigation";
 
-const API_BASE_URL = "http://localhost:3001";
+const API_URL = import.meta.env.VITE_API_URL;
 
 export async function getHealth() {
-  const response = await fetch(`${API_BASE_URL}/health`);
+  const response = await fetch(`${API_URL}/health`);
 
   if (!response.ok) {
     throw new Error("Failed to fetch health");
@@ -18,7 +18,7 @@ export async function getHealth() {
 export async function investigateFailure(
   payload: InvestigationInput
 ): Promise<InvestigationResult> {
-  const response = await fetch(`${API_BASE_URL}/investigate`, {
+  const response = await fetch(`${API_URL}/investigate`, {
     method: "POST",
     headers: {
       "Content-Type": "application/json"
