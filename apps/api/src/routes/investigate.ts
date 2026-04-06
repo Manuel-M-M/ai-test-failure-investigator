@@ -1,28 +1,39 @@
 import { Router } from "express";
-import { z } from "zod";
 import { investigateFailure } from "../services/openai.js";
 
 const router = Router();
 
-const investigationSchema = z.object({
-  errorLog: z.string().min(1, "errorLog is required"),
-  context: z.string().optional(),
-  framework: z.enum(["vitest", "jest", "playwright", "cypress", "generic"])
+router.options("/investigate", (_req, res) => {
+  res.setHeader("Access-Control-Allow-Origin", "*");
+  res.setHeader("Access-Control-Allow-Methods", "GET,POST,OPTIONS");
+  res.setHeader("Access-Control-Allow-Headers", "Content-Type");
+
+  return res.status(200).end();
 });
 
 router.post("/investigate", async (req, res) => {
-  const parsed = investigationSchema.safeParse(req.body);
-
-  if (!parsed.success) {
-    return res.status(400).json({
-      error: "Invalid request body",
-      details: parsed.error.flatten()
-    });
-  }
+  // 🔥 CORS headers SIEMPRE (también en POST)
+  res.setHeader("Access-Control-Allow-Origin", "*");
+  res.setHeader("Access-Control-Allow-Methods", "GET,POST,OPTIONS");
+  res.setHeader("Access-Control-Allow-Headers", "Content-Type");
 
   try {
-    const result = await investigateFailure(parsed.data);
+    const { errorLog, context, framework } = req.body;
+
+    if (!errorLog || typeof errorLog !== "string") {
+      return res.status(400).json({
+        error: "errorLog is required and must be a string"
+      });
+    }
+
+    const result = await investigateFailure({
+      errorLog,
+      context,
+      framework
+    });
+
     return res.json(result);
+
   } catch (error) {
     console.error("Investigation failed:", error);
 
