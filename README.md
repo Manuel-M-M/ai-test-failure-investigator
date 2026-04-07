@@ -35,10 +35,6 @@ Error: page.waitForSelector: Timeout 5000ms exceeded.
 ```
 ---
 
-# 🧩 4. ARCHITECTURE
-
----
-
 ## 🏗 Architecture
 
 ### Frontend
@@ -132,10 +128,6 @@ pnpm dev
 
 - Frontend → http://localhost:5173
 - API → http://localhost:3001
-
----
-
-# 🧩 7. FUTURE IMPROVEMENTS
 
 ---
 
