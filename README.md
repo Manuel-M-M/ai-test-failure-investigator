@@ -37,7 +37,6 @@ Error: page.waitForSelector: Timeout 5000ms exceeded.
 
 # 🧩 4. ARCHITECTURE
 
-```md
 ---
 
 ## 🏗 Architecture
@@ -120,8 +119,6 @@ pnpm install
 apps/api/.env
 ```
 
-### 3. Environment variables
-
 ```env
 OPENAI_API_KEY=your_key_here
 ```
@@ -131,16 +128,15 @@ OPENAI_API_KEY=your_key_here
 ```env
 pnpm dev
 ```
-### 5. URL'S
+### 5. URLs
 
-Frontend → http://localhost:5173
-API → http://localhost:3001
+- Frontend → http://localhost:5173
+- API → http://localhost:3001
 
 ---
 
 # 🧩 7. FUTURE IMPROVEMENTS
 
-```md
 ---
 
 ## 🔮 Future improvements
