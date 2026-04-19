@@ -1,3 +1,5 @@
+import "./LoadingState.css";
+
 export function LoadingState() {
   return (
     <section className="loading-state">

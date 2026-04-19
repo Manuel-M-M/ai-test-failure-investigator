@@ -1,0 +1,142 @@
+.result-container {
+  max-width: 720px;
+  margin: 2rem auto 0;
+  padding: 1.5rem;
+  border: 1px solid #e4e7ec;
+  border-radius: 16px;
+  background: #ffffff;
+  box-shadow: 0 1px 2px rgba(16, 24, 40, 0.04);
+}
+
+.result-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  gap: 1rem;
+  margin-bottom: 1.5rem;
+}
+
+.result-header-copy {
+  flex: 1;
+}
+
+.eyebrow {
+  margin: 0 0 0.35rem;
+  color: #667085;
+  font-size: 0.85rem;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+}
+
+.result-header h2 {
+  margin: 0;
+  font-size: 1.5rem;
+}
+
+.confidence-badge {
+  display: inline-flex;
+  align-items: center;
+  padding: 0.45rem 0.85rem;
+  border-radius: 999px;
+  font-size: 0.875rem;
+  font-weight: 600;
+  text-transform: capitalize;
+  border: 1px solid transparent;
+}
+
+.confidence-badge.high {
+  background: #ecfdf3;
+  color: #027a48;
+  border-color: #abefc6;
+}
+
+.confidence-badge.medium {
+  background: #fffaeb;
+  color: #b54708;
+  border-color: #fedf89;
+}
+
+.confidence-badge.low {
+  background: #fef3f2;
+  color: #b42318;
+  border-color: #fecdca;
+}
+
+.result-section + .result-section {
+  margin-top: 1.75rem;
+}
+
+.result-section {
+  text-align: left;
+}
+
+.result-section h3 {
+  margin: 0 0 0.75rem;
+  font-size: 1rem;
+}
+
+.result-section p,
+.result-section li {
+  color: #344054;
+  line-height: 1.7;
+}
+
+.result-section p {
+  margin: 0;
+}
+
+.result-section ol,
+.result-section ul {
+  margin: 0;
+  padding-left: 1.25rem;
+}
+
+.result-section li + li {
+  margin-top: 0.45rem;
+}
+
+.section-title-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem;
+  margin-bottom: 0.6rem;
+}
+
+.copy-button {
+  border: 1px solid #d0d5dd;
+  background: #ffffff;
+  color: #344054;
+  border-radius: 8px;
+  padding: 0.45rem 0.75rem;
+  font-size: 0.85rem;
+  cursor: pointer;
+  flex-shrink: 0;
+}
+
+.copy-button:hover {
+  background: #f9fafb;
+}
+
+pre {
+  margin: 0;
+  padding: 1rem;
+  overflow-x: auto;
+  border-radius: 12px;
+  background: #101828;
+  color: #f8fafc;
+  font-size: 0.9rem;
+  line-height: 1.6;
+  white-space: pre-wrap;
+}
+
+@media (max-width: 640px) {
+  .result-header {
+    flex-direction: column;
+  }
+
+  .section-title-row {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+}

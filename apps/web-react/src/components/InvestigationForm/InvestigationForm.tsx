@@ -1,5 +1,6 @@
 import { useMemo, useState } from "react";
-import type { Framework } from "../types/investigation";
+import type { Framework } from "../../types/investigation";
+import "./InvestigationForm.css";
 
 interface InvestigationFormProps {
   onSubmit: (payload: {

@@ -1,17 +1,18 @@
 import { useState } from "react";
-import { EmptyState } from "./components/EmptyState";
-import { InvestigationForm } from "./components/InvestigationForm";
-import { LoadingState } from "./components/LoadingState";
+import { EmptyState } from "./components/EmptyState/EmptyState";
+import { InvestigationForm } from "./components/InvestigationForm/InvestigationForm";
+import { InvestigationResult } from "./components/InvestigationResult/InvestigationResult";
+import { LoadingState } from "./components/LoadingState/LoadingState";
 import { investigateFailure } from "./services/api";
 import type {
   InvestigationInput,
-  InvestigationResult
+  InvestigationResult as InvestigationResultType
 } from "./types/investigation";
 
 export default function App() {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
-  const [result, setResult] = useState<InvestigationResult | null>(null);
+  const [result, setResult] = useState<InvestigationResultType | null>(null);
   const [hasSubmitted, setHasSubmitted] = useState(false);
 
   async function handleInvestigation(payload: InvestigationInput) {
@@ -46,15 +47,7 @@ export default function App() {
 
       {!loading && !result && !hasSubmitted ? <EmptyState /> : null}
 
-      {!loading && result ? (
-        <section className="result-placeholder">
-          <h2>Investigation received</h2>
-          <p>
-            The React client is now connected to the backend. Next step: render
-            the structured investigation result.
-          </p>
-        </section>
-      ) : null}
+      {!loading && result ? <InvestigationResult result={result} /> : null}
     </div>
   );
 }
