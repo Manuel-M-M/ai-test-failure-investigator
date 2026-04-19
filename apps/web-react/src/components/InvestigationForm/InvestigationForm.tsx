@@ -12,10 +12,10 @@ interface InvestigationFormProps {
   error: string | null;
 }
 
-export function InvestigationForm({
+export default function InvestigationForm({
   onSubmit,
   loading,
-  error
+  error,
 }: InvestigationFormProps) {
   const [errorLog, setErrorLog] = useState("");
   const [context, setContext] = useState("");
@@ -35,7 +35,7 @@ export function InvestigationForm({
     await onSubmit({
       errorLog,
       context: context.trim() || undefined,
-      framework
+      framework,
     });
   }
 
@@ -60,7 +60,7 @@ waiting for selector ".submit-button"
   44 |
   45 | await expect(page.locator('.success')).toBeVisible();`);
     setContext(
-      "The submit button is rendered only after fetching user data from an API. The test sometimes fails in CI but passes locally."
+      "The submit button is rendered only after fetching user data from an API. The test sometimes fails in CI but passes locally.",
     );
   }
 

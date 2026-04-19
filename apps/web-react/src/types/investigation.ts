@@ -21,3 +21,14 @@ export interface InvestigationResult {
   confidence: ConfidenceLevel;
   caveats: string[];
 }
+
+export interface InvestigationHistoryItem {
+  id: string;
+  createdAt: string;
+  input: {
+    errorLog: string;
+    context?: string;
+    framework: Framework;
+  };
+  result: InvestigationResult;
+}

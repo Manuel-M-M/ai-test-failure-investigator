@@ -25,7 +25,9 @@ Caveats:
 ${result.caveats.map((caveat) => `- ${caveat}`).join("\n")}`;
 }
 
-export function InvestigationResult({ result }: InvestigationResultProps) {
+export default function InvestigationResult({
+  result,
+}: InvestigationResultProps) {
   async function copyToClipboard(value: string) {
     await navigator.clipboard.writeText(value);
   }

@@ -1,12 +1,16 @@
 import { useState } from "react";
-import { EmptyState } from "./components/EmptyState/EmptyState";
-import { InvestigationForm } from "./components/InvestigationForm/InvestigationForm";
-import { InvestigationResult } from "./components/InvestigationResult/InvestigationResult";
-import { LoadingState } from "./components/LoadingState/LoadingState";
+import {
+  EmptyState,
+  InvestigationForm,
+  InvestigationResult,
+  LoadingState,
+  RecentInvestigations,
+} from "./components";
 import { investigateFailure } from "./services/api";
+import { saveToHistory } from "./services/history";
 import type {
   InvestigationInput,
-  InvestigationResult as InvestigationResultType
+  InvestigationResult as InvestigationResultType,
 } from "./types/investigation";
 
 export default function App() {
@@ -24,15 +28,28 @@ export default function App() {
     try {
       const investigation = await investigateFailure(payload);
       setResult(investigation);
+
+      saveToHistory({
+        id: crypto.randomUUID(),
+        createdAt: new Date().toISOString(),
+        input: payload,
+        result: investigation,
+      });
     } catch (err) {
       setError(
         err instanceof Error
           ? err.message
-          : "Something went wrong while investigating the failure"
+          : "Something went wrong while investigating the failure",
       );
     } finally {
       setLoading(false);
     }
+  }
+
+  function handleSelectHistory(item: any) {
+    setResult(item.result);
+    setHasSubmitted(true);
+    setError(null);
   }
 
   return (
@@ -42,6 +59,8 @@ export default function App() {
         loading={loading}
         error={error}
       />
+
+      <RecentInvestigations onSelect={handleSelectHistory} />
 
       {loading ? <LoadingState /> : null}
 

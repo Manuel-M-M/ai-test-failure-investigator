@@ -1,6 +1,6 @@
 import "./EmptyState.css";
 
-export function EmptyState() {
+export default function EmptyState() {
   return (
     <section className="empty-state">
       <h2>Ready to investigate</h2>

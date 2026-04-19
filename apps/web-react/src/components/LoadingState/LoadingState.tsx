@@ -1,6 +1,6 @@
 import "./LoadingState.css";
 
-export function LoadingState() {
+export default function LoadingState() {
   return (
     <section className="loading-state">
       <div className="spinner" />
