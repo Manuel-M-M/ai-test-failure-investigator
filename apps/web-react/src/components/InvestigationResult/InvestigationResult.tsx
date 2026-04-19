@@ -1,9 +1,12 @@
+import { useState } from "react";
 import type { InvestigationResult as InvestigationResultType } from "../../types/investigation";
 import "./InvestigationResult.css";
 
 interface InvestigationResultProps {
   result: InvestigationResultType;
 }
+
+type CopyTarget = "suggestedFix" | "snippet" | "full" | null;
 
 function buildFullInvestigationText(result: InvestigationResultType) {
   return `Likely root cause:
@@ -28,8 +31,15 @@ ${result.caveats.map((caveat) => `- ${caveat}`).join("\n")}`;
 export default function InvestigationResult({
   result,
 }: InvestigationResultProps) {
-  async function copyToClipboard(value: string) {
+  const [copiedTarget, setCopiedTarget] = useState<CopyTarget>(null);
+
+  async function copyToClipboard(value: string, target: CopyTarget) {
     await navigator.clipboard.writeText(value);
+    setCopiedTarget(target);
+
+    window.setTimeout(() => {
+      setCopiedTarget((current) => (current === target ? null : current));
+    }, 1500);
   }
 
   return (
@@ -38,6 +48,10 @@ export default function InvestigationResult({
         <div className="result-header-copy">
           <p className="eyebrow">Analysis complete</p>
           <h2>Investigation Result</h2>
+          <p className="result-description">
+            Structured debugging guidance based on the failure log and context
+            provided.
+          </p>
         </div>
 
         <span className={`confidence-badge ${result.confidence}`}>
@@ -65,9 +79,9 @@ export default function InvestigationResult({
           <button
             type="button"
             className="copy-button"
-            onClick={() => copyToClipboard(result.suggestedFix)}
+            onClick={() => copyToClipboard(result.suggestedFix, "suggestedFix")}
           >
-            Copy
+            {copiedTarget === "suggestedFix" ? "Copied!" : "Copy"}
           </button>
         </div>
         <p>{result.suggestedFix}</p>
@@ -79,9 +93,11 @@ export default function InvestigationResult({
           <button
             type="button"
             className="copy-button"
-            onClick={() => copyToClipboard(result.improvedTestSnippet)}
+            onClick={() =>
+              copyToClipboard(result.improvedTestSnippet, "snippet")
+            }
           >
-            Copy
+            {copiedTarget === "snippet" ? "Copied!" : "Copy"}
           </button>
         </div>
         <pre>{result.improvedTestSnippet}</pre>
@@ -93,9 +109,11 @@ export default function InvestigationResult({
           <button
             type="button"
             className="copy-button"
-            onClick={() => copyToClipboard(buildFullInvestigationText(result))}
+            onClick={() =>
+              copyToClipboard(buildFullInvestigationText(result), "full")
+            }
           >
-            Copy full result
+            {copiedTarget === "full" ? "Copied!" : "Copy full result"}
           </button>
         </div>
         <ul>

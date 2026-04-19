@@ -33,6 +33,12 @@
   font-size: 1.5rem;
 }
 
+.result-description {
+  margin: 0.5rem 0 0;
+  color: #667085;
+  line-height: 1.6;
+}
+
 .confidence-badge {
   display: inline-flex;
   align-items: center;
@@ -110,12 +116,15 @@
   border-radius: 8px;
   padding: 0.45rem 0.75rem;
   font-size: 0.85rem;
+  font-weight: 600;
   cursor: pointer;
   flex-shrink: 0;
+  transition: background 0.2s ease, border-color 0.2s ease;
 }
 
 .copy-button:hover {
   background: #f9fafb;
+  border-color: #98a2b3;
 }
 
 pre {
