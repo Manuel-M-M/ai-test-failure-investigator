@@ -1,43 +1,60 @@
-export default function App() {
-  return (
-    <main
-      style={{
-        minHeight: "100vh",
-        display: "grid",
-        placeItems: "center",
-        padding: "2rem",
-        fontFamily:
-          'Inter, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif'
-      }}
-    >
-      <section
-        style={{
-          width: "100%",
-          maxWidth: "720px",
-          textAlign: "center"
-        }}
-      >
-        <h1
-          style={{
-            margin: "0 0 1rem",
-            fontSize: "clamp(2rem, 4vw, 3rem)",
-            lineHeight: 1.1
-          }}
-        >
-          AI Test Failure Investigator
-        </h1>
+import { useState } from "react";
+import { EmptyState } from "./components/EmptyState";
+import { InvestigationForm } from "./components/InvestigationForm";
+import { LoadingState } from "./components/LoadingState";
+import { investigateFailure } from "./services/api";
+import type {
+  InvestigationInput,
+  InvestigationResult
+} from "./types/investigation";
 
-        <p
-          style={{
-            margin: 0,
-            color: "#667085",
-            fontSize: "1.05rem",
-            lineHeight: 1.7
-          }}
-        >
-          React frontend in progress. This will become the main product client.
-        </p>
-      </section>
-    </main>
+export default function App() {
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState<string | null>(null);
+  const [result, setResult] = useState<InvestigationResult | null>(null);
+  const [hasSubmitted, setHasSubmitted] = useState(false);
+
+  async function handleInvestigation(payload: InvestigationInput) {
+    setHasSubmitted(true);
+    setLoading(true);
+    setError(null);
+    setResult(null);
+
+    try {
+      const investigation = await investigateFailure(payload);
+      setResult(investigation);
+    } catch (err) {
+      setError(
+        err instanceof Error
+          ? err.message
+          : "Something went wrong while investigating the failure"
+      );
+    } finally {
+      setLoading(false);
+    }
+  }
+
+  return (
+    <div className="page">
+      <InvestigationForm
+        onSubmit={handleInvestigation}
+        loading={loading}
+        error={error}
+      />
+
+      {loading ? <LoadingState /> : null}
+
+      {!loading && !result && !hasSubmitted ? <EmptyState /> : null}
+
+      {!loading && result ? (
+        <section className="result-placeholder">
+          <h2>Investigation received</h2>
+          <p>
+            The React client is now connected to the backend. Next step: render
+            the structured investigation result.
+          </p>
+        </section>
+      ) : null}
+    </div>
   );
 }
