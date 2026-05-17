@@ -7,9 +7,22 @@ yarn-error.log*
 pnpm-debug.log*
 lerna-debug.log*
 
+# Dependencies and build output
 node_modules
 dist
 dist-ssr
+.vite
+coverage
+
+# Environment files
+.env
+.env.*
+!.env.example
+
+# Deploy/platform
+.vercel
+
+# Local-only files
 *.local
 
 # Editor directories and files
@@ -17,6 +30,7 @@ dist-ssr
 !.vscode/extensions.json
 .idea
 .DS_Store
+Thumbs.db
 *.suo
 *.ntvs*
 *.njsproj
